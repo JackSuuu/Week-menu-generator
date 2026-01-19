@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luly 的可爱便当周计划</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Ma+Shan+Zheng&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Noto Sans SC', 'sans-serif'],
+                        display: ['ZCOOL KuaiLe', 'cursive'],
+                        hand: ['Ma Shan Zheng', 'cursive'],
+                    },
+                    colors: {
+                        'luly-red': '#ff6b6b',
+                        'luly-yellow': '#ffe66d',
+                        'luly-blue': '#4ecdc4',
+                        'luly-dark': '#292f36',
+                        'luly-bg': '#f7fff7',
+                        'paper': '#fffbf0',
+                    },
+                    animation: {
+                        'bounce-slow': 'bounce 3s infinite',
+                        'wiggle': 'wiggle 1s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        wiggle: {
+                            '0%, 100%': { transform: 'rotate(-3deg)' },
+                            '50%': { transform: 'rotate(3deg)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f7fff7;
+            background-image: 
+                radial-gradient(#4ecdc4 15%, transparent 16%),
+                radial-gradient(#ff6b6b 15%, transparent 16%);
+            background-size: 30px 30px;
+            background-position: 0 0, 15px 15px;
+            overflow-x: hidden;
+        }
+
+        /* 手账风格的不规则阴影 */
+        .doodle-shadow {
+            box-shadow: 6px 6px 0px 2px #292f36;
+            border: 3px solid #292f36;
+        }
+        .doodle-shadow:hover {
+            box-shadow: 8px 8px 0px 4px #292f36;
+            transform: translate(-2px, -2px) rotate(-1deg);
+        }
+        .doodle-shadow:active {
+            box-shadow: 0px 0px 0px 2px #292f36;
+            transform: translate(4px, 4px);
+        }
+
+        /* 像便利贴一样的随机边框 */
+        .sticky-note {
+            border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+        }
+
+        /* 模态框动画 */
+        dialog[open] {
+            animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        dialog::backdrop {
+            background: rgba(41, 47, 54, 0.4);
+            backdrop-filter: blur(4px);
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.9) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* 可爱滚动条 */
+        .cute-scroll::-webkit-scrollbar {
+            width: 10px;
+        }
+        .cute-scroll::-webkit-scrollbar-track {
+            background: #fff;
+            border-radius: 5px;
+            border: 2px solid #292f36;
+        }
+        .cute-scroll::-webkit-scrollbar-thumb {
+            background: #ff6b6b;
+            border-radius: 5px;
+            border: 2px solid #292f36;
+        }
+
+        /* 旋转工具类 */
+        .rotate-r-2 { transform: rotate(2deg); }
+        .rotate-l-2 { transform: rotate(-2deg); }
+        .rotate-r-1 { transform: rotate(1deg); }
+        .rotate-l-1 { transform: rotate(-1deg); }
+    </style>
+</head>
+<body class="min-h-screen text-luly-dark p-4 md:p-8">
+
+    <!-- 装饰贴纸 -->
+    <div class="fixed top-10 left-10 text-6xl animate-bounce-slow hidden xl:block pointer-events-none">🥦</div>
+    <div class="fixed bottom-20 right-10 text-6xl animate-bounce-slow hidden xl:block pointer-events-none" style="animation-delay: 1s">🍗</div>
+    <div class="fixed top-40 right-20 text-6xl animate-bounce-slow hidden xl:block pointer-events-none" style="animation-delay: 0.5s">🍅</div>
+
+    <!-- Header -->
+    <header class="max-w-4xl mx-auto text-center mb-10 pt-4 relative">
+        <div class="inline-block bg-white p-6 sticky-note doodle-shadow rotate-l-2">
+            <h1 class="font-display text-5xl md:text-6xl text-luly-red mb-2 tracking-wide">
+                今天吃什么？
+                <span class="inline-block text-4xl animate-wiggle">🤔</span>
+            </h1>
+            <p class="text-xl font-hand text-luly-dark font-bold">Luly 的专属随机菜单 · V2.0 加强版</p>
+        </div>
+    </header>
+
+    <!-- Controls -->
+    <div class="max-w-5xl mx-auto mb-10 flex flex-wrap justify-center gap-4 md:gap-8 z-10 relative">
+        <button onclick="generateWeek()" class="doodle-shadow px-6 py-3 bg-luly-yellow text-luly-dark font-display text-xl rounded-xl hover:bg-yellow-300 transition-colors rotate-l-1">
+            🎲 变魔术生成菜单
+        </button>
+
+        <button onclick="copyMarkdown()" class="doodle-shadow px-6 py-3 bg-luly-blue text-white font-display text-xl rounded-xl hover:bg-teal-400 transition-colors rotate-r-1">
+            📋 复制 Markdown
+        </button>
+        
+        <button onclick="openManager()" class="doodle-shadow px-6 py-3 bg-white text-luly-dark font-display text-xl rounded-xl hover:bg-gray-50 transition-colors rotate-l-1">
+            ✏️ 编辑我的菜单库
+        </button>
+    </div>
+
+    <!-- Main Content Grid -->
+    <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Visual Menu (Left 2 Columns) -->
+        <div id="visual-menu" class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 pb-20">
+            <!-- Cards will be injected here -->
+            <div class="col-span-1 md:col-span-2 text-center py-20">
+                <div class="inline-block p-8 bg-white sticky-note doodle-shadow rotate-1">
+                    <p class="text-2xl font-hand text-gray-400">点击上面的“变魔术”按钮开始吧！✨</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Markdown Output (Right Column) -->
+        <div class="lg:col-span-1">
+            <div class="bg-white doodle-shadow p-1 sticky top-8 rotate-1" style="border-radius: 10px;">
+                <div class="bg-luly-red text-white p-3 font-display text-xl text-center border-b-4 border-luly-dark">
+                    📝 笔记预览区
+                </div>
+                <div class="p-2 bg-paper">
+                    <textarea id="markdown-output" class="w-full h-[500px] p-4 font-mono text-sm bg-transparent border-none resize-none focus:outline-none cute-scroll" readonly placeholder="这里会生成 Markdown 代码哦..."></textarea>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Menu Manager Modal -->
+    <dialog id="manager-modal" class="bg-transparent p-0 w-full max-w-4xl h-[85vh] backdrop:bg-gray-800/50">
+        <div class="w-full h-full bg-paper border-4 border-luly-dark rounded-3xl overflow-hidden flex flex-col shadow-2xl relative">
+            
+            <!-- Modal Header -->
+            <div class="bg-luly-yellow border-b-4 border-luly-dark p-4 flex justify-between items-center">
+                <h2 class="font-display text-3xl text-luly-dark">🥕 菜谱大管家</h2>
+                <button onclick="closeManager()" class="w-10 h-10 bg-luly-red text-white rounded-full border-2 border-black hover:scale-110 transition-transform font-bold">X</button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="flex flex-1 overflow-hidden">
+                <!-- Sidebar (Categories) -->
+                <div class="w-1/4 bg-white border-r-4 border-luly-dark overflow-y-auto cute-scroll p-2 flex flex-col gap-2" id="category-tabs">
+                    <!-- Tabs injected by JS -->
+                </div>
+
+                <!-- Content Area -->
+                <div class="w-3/4 flex flex-col bg-paper">
+                    <!-- List of items -->
+                    <div class="flex-1 overflow-y-auto cute-scroll p-6" id="items-list">
+                        <!-- Items injected by JS -->
+                    </div>
+
+                    <!-- Add New Item Form -->
+                    <div class="border-t-4 border-dashed border-luly-dark p-6 bg-white">
+                        <h3 class="font-display text-xl mb-4 text-luly-blue">✨ 添加新菜品到当前分类</h3>
+                        <div class="flex gap-4 items-end">
+                            <div class="flex-1">
+                                <label class="block font-bold text-xs mb-1">菜名</label>
+                                <input type="text" id="new-name" class="w-full border-2 border-luly-dark rounded-lg p-2 focus:ring-2 focus:ring-luly-yellow outline-none" placeholder="比如：红烧狮子头">
+                            </div>
+                            <div class="flex-[2]">
+                                <label class="block font-bold text-xs mb-1">食材备注 (选填)</label>
+                                <input type="text" id="new-ingredients" class="w-full border-2 border-luly-dark rounded-lg p-2 focus:ring-2 focus:ring-luly-yellow outline-none" placeholder="猪肉、马蹄...">
+                            </div>
+                            <button onclick="addItem()" class="bg-luly-green bg-[#4ecdc4] text-white border-2 border-luly-dark rounded-lg px-6 py-2 font-display hover:translate-y-[-2px] hover:shadow-lg transition-all">
+                                添加
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </dialog>
+
+    <footer class="text-center mt-10 text-gray-500 font-hand text-lg pb-8">
+        <p>Made with 🍰 for Luly's Kitchen</p>
+        <button onclick="resetData()" class="text-xs underline mt-2 text-gray-400 hover:text-red-500">重置所有数据到初始状态</button>
+    </footer>
+
+    <script>
+        // --- Category Mapping for UI Names ---
+        const categoryMap = {
+            cold: "🥗 凉菜",
+            pressure: "🥘 高压锅/电饭煲",
+            hard: "🍲 硬菜 (周末)",
+            meat: "🥩 肉菜",
+            veg: "🥬 素菜",
+            steamed: "🥣 蒸菜",
+            riceNoodle: "🍜 饭/面",
+            oven: "🔥 烤箱"
+        };
+
+        // --- Initial Data (Fallback) ---
+        const defaultMenuData = {
+            cold: [
+                {name: "葱油手撕鸡", ingredients: "鸡腿/整鸡、葱、姜"},
+                {name: "香菜拌牛肉", ingredients: "牛肉、香菜"},
+                {name: "凉拌黄瓜", ingredients: "黄瓜、大蒜、小米辣"},
+                {name: "糖渍番茄", ingredients: "番茄、糖"},
+                {name: "酸辣柠檬虾", ingredients: "虾、柠檬、辣椒"},
+                {name: "泰式柠檬虾", ingredients: "虾、泰式调料"},
+            ],
+            pressure: [
+                {name: "非常童年卤鸡腿", ingredients: "鸡腿，鸡蛋，葱，姜，蒜"},
+                {name: "番茄牛腩", ingredients: "牛腩、番茄、洋葱、土豆、姜、番茄酱"},
+                {name: "土豆牛腩", ingredients: "牛腩、土豆、胡萝卜、姜"},
+                {name: "煲仔饭", ingredients: "广式腊肠、菜心、鸡蛋、姜、蚝油"},
+                {name: "韩式拌饭", ingredients: "豆芽、菠菜、胡萝卜、香菇、牛肉丝/五花肉、鸡蛋"},
+            ],
+            hard: [
+                {name: "火锅", ingredients: "火锅底料、牛羊肉卷、各种丸子、豆腐、蔬菜"},
+                {name: "寿喜锅", ingredients: "牛肉片、内脂豆腐、香菇、金针菇、大白菜、无菌蛋"},
+                {name: "椰子鸡", ingredients: "整鸡、椰子水、姜、沙姜、青柠"},
+                {name: "日式咖喱", ingredients: "鸡肉/牛肉、土豆、胡萝卜、洋葱、咖喱块、椰浆"},
+            ],
+            meat: [
+                {name: "黑椒海盐杰克牛排", ingredients: "牛排、黑胡椒、海盐、大蒜、迷迭香、黄油"},
+                {name: "蒜香黑椒牛柳", ingredients: "牛里脊、大蒜、黑胡椒、蚝油、淀粉"},
+                {name: "菜椒西兰花西葫芦炒牛柳", ingredients: "牛里脊、彩椒、西兰花、西葫芦、大蒜"},
+                {name: "超级luly黄焖鸡", ingredients: "鸡腿肉、干香菇、土豆、青椒、姜、黄豆酱"},
+                {name: "干煎柠檬鸡", ingredients: "鸡腿肉、柠檬、蜂蜜、黑胡椒、大蒜"},
+                {name: "小鸡炖土豆加蘑菇", ingredients: "鸡肉、蘑菇、土豆、粉条、姜"},
+                {name: "葱油焖鸡", ingredients: "鸡腿肉、红葱头/大葱"},
+                {name: "彩椒炒鸡腿肉", ingredients: "鸡腿肉、彩椒"},
+                {name: "可乐鸡翅", ingredients: "鸡翅、可乐"},
+                {name: "糖醋排骨", ingredients: "猪排骨、姜、芝麻、香醋"},
+                {name: "无敌甜椒辣炒肉", ingredients: "猪肉、甜椒、尖椒、大蒜"},
+                {name: "农家一碗香", ingredients: "五花肉、鸡蛋、青椒、大蒜、豆豉"},
+                {name: "回锅肉", ingredients: "五花肉、青蒜、豆瓣酱"},
+                {name: "年糕汤（鱼丸）", ingredients: "年糕、鱼丸、虾皮、紫菜、葱、白胡椒粉"},
+                {name: "蒜蓉黄油虾", ingredients: "虾、蒜蓉、黄油"},
+                {name: "香煎龙利鱼", ingredients: "龙利鱼、黑胡椒"},
+            ],
+            veg: [
+                {name: "蚝油生菜", ingredients: "生菜、大蒜、蚝油、淀粉"},
+                {name: "清炒白菜", ingredients: "大白菜、大蒜"},
+                {name: "清炒西兰花", ingredients: "西兰花、大蒜"},
+                {name: "蒜香芦笋", ingredients: "芦笋、大蒜"},
+                {name: "醋溜白菜", ingredients: "大白菜、干辣椒、大蒜"},
+                {name: "手撕包菜", ingredients: "卷心菜、五花肉片、干辣椒、大蒜、蒸鱼豉油"},
+                {name: "蒜香煎豆腐", ingredients: "豆腐、蒜"},
+                {name: "luly最爱番茄炒蛋", ingredients: "番茄、鸡蛋、小葱、番茄酱"},
+                {name: "黄瓜炒蛋", ingredients: "黄瓜、鸡蛋、大蒜"},
+                {name: "西葫芦炒蛋", ingredients: "西葫芦、鸡蛋、大蒜"},
+                {name: "红烧土豆片", ingredients: "土豆、酱油"},
+                {name: "地三鲜", ingredients: "茄子、土豆、青椒、大蒜、淀粉"},
+                {name: "土豆烩茄子", ingredients: "土豆、茄子、大蒜、黄豆酱"},
+                {name: "肉末茄子", ingredients: "茄子、猪肉末、姜、蒜、豆瓣酱"},
+                {name: "豆角烧肉", ingredients: "豆角、五花肉"},
+                {name: "番茄鸡蛋汤", ingredients: "番茄、鸡蛋、葱、香油"},
+                {name: "番茄白菜汤", ingredients: "番茄、大白菜、姜"},
+                {name: "豆腐蘑菇汤", ingredients: "嫩豆腐、杂菇、葱、白胡椒粉"},
+                {name: "玉米排骨汤", ingredients: "玉米、排骨"},
+            ],
+            steamed: [
+                {name: "蒸鸡蛋", ingredients: "鸡蛋、香油、葱花"},
+                {name: "南瓜蒸牛肉", ingredients: "牛肉片、南瓜、姜丝、蒜末"},
+                {name: "香菇滑鸡", ingredients: "鸡腿肉、干香菇、红枣、姜、淀粉"},
+            ],
+            riceNoodle: [
+                {name: "凉拌鸡丝", ingredients: "鸡胸肉、调料"},
+                {name: "海南鸡饭", ingredients: "鸡肉、大米、斑斓叶、香茅、姜、辣椒酱"},
+                {name: "卤肉饭", ingredients: "五花肉、红葱头酥、干香菇、鸡蛋、五香粉"},
+                {name: "打抛饭", ingredients: "猪肉末、罗勒叶、小米辣、大蒜、鱼露、鸡蛋"},
+                {name: "日式碎鸡饭", ingredients: "鸡肉末、鸡蛋、四季豆/荷兰豆、味醂"},
+                {name: "日式三文鱼盖饭", ingredients: "三文鱼、米饭"},
+                {name: "葱油鸡腿饭", ingredients: "鸡腿、葱油酱汁、青菜"},
+                {name: "照烧鸡腿饭", ingredients: "鸡腿、照烧汁"},
+                {name: "番茄滑蛋牛肉饭", ingredients: "牛肉片、番茄、鸡蛋"},
+                {name: "番茄肉酱意面", ingredients: "意面、猪/牛肉末、番茄、洋葱、大蒜"},
+                {name: "奶油鸡肉意面", ingredients: "意面、鸡腿肉、淡奶油、口蘑、菠菜"},
+                {name: "千层面", ingredients: "面皮、肉酱、芝士"},
+                {name: "酸汤水饺", ingredients: "水饺、陈醋、辣椒油、紫菜、虾皮、香菜"},
+                {name: "麻辣烫", ingredients: "各类丸子蔬菜"},
+                {name: "阳春面", ingredients: "面条、猪油、葱"},
+            ],
+            oven: [
+                {name: "烤茄子", ingredients: "茄子、蒜、剁椒、葱花、孜然粉"},
+                {name: "烤全鸡", ingredients: "整鸡、黄油、黑胡椒、柠檬、迷迭香"},
+                {name: "北京烤鸭", ingredients: "鸭子、蜂蜜、荷叶饼、葱丝、黄瓜条、甜面酱"},
+            ]
+        };
+
+        // --- Application State ---
+        let menuData = {};
+        let currentTab = 'meat';
+
+        // --- Data Management Functions ---
+        function initData() {
+            const stored = localStorage.getItem('lulyMenuData_v2');
+            if (stored) {
+                menuData = JSON.parse(stored);
+            } else {
+                menuData = JSON.parse(JSON.stringify(defaultMenuData)); // Deep copy
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('lulyMenuData_v2', JSON.stringify(menuData));
+        }
+
+        function resetData() {
+            if(confirm('确定要重置回默认菜单吗？你添加的菜品都会消失哦！')) {
+                localStorage.removeItem('lulyMenuData_v2');
+                location.reload();
+            }
+        }
+
+        // --- Generator Logic (Enhanced) ---
+        const weekDays = ["周六", "周日", "周一", "周二", "周三", "周四", "周五"];
+        
+        function getRandom(arr) {
+            if (!arr || arr.length === 0) return { name: "暂无菜品", ingredients: "" };
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function getDailyMenu(dayIndex) {
+            const isWeekend = (dayIndex === 0 || dayIndex === 1);
+            let dishes = [];
+            let comboType = "";
+            const roll = Math.random();
+
+            // Safety check for empty categories
+            const safeGet = (pool) => {
+                if (!pool || pool.length === 0) return null;
+                return getRandom(pool);
+            }
+
+            if (isWeekend) {
+                if (roll < 0.4) {
+                    const pool = [...(menuData.hard||[]), ...(menuData.oven||[]), ...(menuData.pressure||[])];
+                    const dish = safeGet(pool);
+                    if(dish) dishes.push(dish);
+                    comboType = "weekend-special";
+                } else if (roll < 0.8) {
+                    const meat = safeGet(menuData.meat);
+                    const veg = safeGet(menuData.veg);
+                    if(meat) dishes.push(meat);
+                    if(veg) dishes.push(veg);
+                    comboType = "standard";
+                } else {
+                    const rice = safeGet(menuData.riceNoodle);
+                    if(rice) dishes.push(rice);
+                    comboType = "one-dish";
+                }
+            } else {
+                if (roll < 0.5) {
+                    const meat = safeGet(menuData.meat);
+                    const veg = safeGet(menuData.veg);
+                    if(meat) dishes.push(meat);
+                    if(veg) dishes.push(veg);
+                    comboType = "standard";
+                } else if (roll < 0.8) {
+                    const rice = safeGet(menuData.riceNoodle);
+                    if(rice) dishes.push(rice);
+                    comboType = "one-dish";
+                } else {
+                    const meat = safeGet([...(menuData.meat||[]), ...(menuData.steamed||[])]);
+                    if(meat) dishes.push(meat);
+                    if (Math.random() > 0.6) {
+                        const side = safeGet([...(menuData.veg||[]), ...(menuData.cold||[])]);
+                        if(side) dishes.push(side);
+                    }
+                    comboType = "simple";
+                }
+            }
+            return { dishes, comboType };
+        }
+
+        function generateWeek() {
+            const container = document.getElementById('visual-menu');
+            const mdOutput = document.getElementById('markdown-output');
+            
+            container.innerHTML = '';
+            let markdownContent = "| 本周菜单 | 在家人数 | 菜单 |\n| :--- | :---: | :--- |\n";
+
+            weekDays.forEach((day, index) => {
+                const { dishes, comboType } = getDailyMenu(index);
+                
+                // Styling
+                let typeClass = "bg-white rotate-r-1";
+                let icon = "🍳";
+                let borderColor = "border-luly-dark";
+                
+                // Random rotations for scrapbook feel
+                const rotations = ["rotate-1", "-rotate-1", "rotate-2", "-rotate-2", "rotate-0"];
+                const randRot = rotations[Math.floor(Math.random() * rotations.length)];
+
+                if (comboType === 'weekend-special') {
+                    typeClass = "bg-[#ffe66d] " + randRot; // Yellow
+                    icon = "🍲";
+                } else if (comboType === 'one-dish') {
+                    typeClass = "bg-[#fffbf0] " + randRot; // Paper color
+                    icon = "🍜";
+                } else {
+                    typeClass = "bg-white " + randRot;
+                }
+
+                const dishesHtml = dishes.map(d => `
+                    <div class="mb-3 last:mb-0 group/dish relative">
+                        <div class="absolute -left-2 top-2 w-full h-2 bg-luly-yellow opacity-30 transform -skew-x-12 hidden group-hover/dish:block transition-all"></div>
+                        <span class="relative font-bold text-lg text-luly-dark z-10 cursor-help">${d.name}</span>
+                        <p class="text-xs text-gray-500 mt-1 font-hand">${d.ingredients || '无特别食材'}</p>
+                    </div>
+                `).join('');
+
+                const people = (index === 0 || index === 1) ? "⭐☀" : (Math.random() > 0.3 ? "⭐☀" : "⭐");
+
+                const card = document.createElement('div');
+                card.className = `relative p-5 sticky-note doodle-shadow flex flex-col justify-between h-full min-h-[180px] ${typeClass} overflow-hidden transition-all duration-300`;
+                card.innerHTML = `
+                    <div class="absolute -top-4 -right-4 p-4 opacity-10 text-8xl select-none font-display pointer-events-none text-black">${icon}</div>
+                    <div class="mb-4 flex justify-between items-center border-b-2 border-dashed border-gray-300 pb-2">
+                        <h3 class="font-display text-2xl text-luly-red">${day}</h3>
+                        <span class="text-xs font-bold bg-luly-dark text-white px-2 py-1 rounded-full">${people}</span>
+                    </div>
+                    <div class="relative z-10 flex-1 flex flex-col justify-center">
+                        ${dishesHtml || '<span class="text-gray-400 italic">点外卖吧?</span>'}
+                    </div>
+                `;
+                
+                container.appendChild(card);
+
+                const dishesText = dishes.map(d => d.name).join(" + ");
+                markdownContent += `| ${day} | ${people} | ${dishesText} |\n`;
+            });
+
+            mdOutput.value = markdownContent;
+
+            // Simple Stagger Animation
+            Array.from(container.children).forEach((child, i) => {
+                child.style.opacity = '0';
+                child.style.transform = 'translateY(20px) rotate(0deg)';
+                setTimeout(() => {
+                    child.style.transition = 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                    child.style.opacity = '1';
+                    // Apply random rotation back
+                    const rot = Math.random() * 4 - 2; 
+                    child.style.transform = `translateY(0) rotate(${rot}deg)`;
+                }, i * 100);
+            });
+        }
+
+        // --- Manager UI Logic ---
+        function openManager() {
+            renderManagerTabs();
+            renderManagerItems();
+            document.getElementById('manager-modal').showModal();
+        }
+
+        function closeManager() {
+            document.getElementById('manager-modal').close();
+            // Refresh main view to reflect changes if any
+            generateWeek();
+        }
+
+        function renderManagerTabs() {
+            const tabsContainer = document.getElementById('category-tabs');
+            tabsContainer.innerHTML = '';
+            
+            Object.keys(categoryMap).forEach(key => {
+                const btn = document.createElement('button');
+                const isActive = currentTab === key;
+                btn.className = `w-full text-left p-3 rounded-lg font-display text-lg mb-2 transition-all ${isActive ? 'bg-luly-yellow border-2 border-luly-dark shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] translate-x-1' : 'hover:bg-gray-100'}`;
+                btn.innerText = categoryMap[key];
+                btn.onclick = () => {
+                    currentTab = key;
+                    renderManagerTabs();
+                    renderManagerItems();
+                };
+                tabsContainer.appendChild(btn);
+            });
+        }
+
+        function renderManagerItems() {
+            const listContainer = document.getElementById('items-list');
+            listContainer.innerHTML = '';
+            
+            const items = menuData[currentTab] || [];
+
+            if (items.length === 0) {
+                listContainer.innerHTML = `<div class="text-center text-gray-400 font-hand text-xl mt-10">这个分类还没有菜哦，快去添加吧！😋</div>`;
+                return;
+            }
+
+            items.forEach((item, index) => {
+                const row = document.createElement('div');
+                row.className = "flex justify-between items-center bg-white p-3 mb-2 rounded-lg border border-gray-200 hover:border-luly-blue hover:shadow-md transition-all group";
+                row.innerHTML = `
+                    <div>
+                        <span class="font-bold text-lg">${item.name}</span>
+                        <span class="text-xs text-gray-400 ml-2">${item.ingredients}</span>
+                    </div>
+                    <button onclick="deleteItem(${index})" class="text-gray-300 hover:text-red-500 font-bold px-3 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                        🗑️ 删除
+                    </button>
+                `;
+                listContainer.appendChild(row);
+            });
+        }
+
+        function addItem() {
+            const nameInput = document.getElementById('new-name');
+            const ingInput = document.getElementById('new-ingredients');
+            
+            const name = nameInput.value.trim();
+            const ingredients = ingInput.value.trim();
+
+            if (!name) {
+                alert("菜名不能为空哦！😤");
+                return;
+            }
+
+            if (!menuData[currentTab]) menuData[currentTab] = [];
+            
+            menuData[currentTab].push({ name, ingredients });
+            saveData();
+            
+            // Clear inputs
+            nameInput.value = '';
+            ingInput.value = '';
+            
+            // Refresh list
+            renderManagerItems();
+            
+            // Cute success feedback
+            const btn = document.querySelector('button[onclick="addItem()"]');
+            const originalText = btn.innerText;
+            btn.innerText = "添加成功! 🎉";
+            setTimeout(() => btn.innerText = originalText, 1500);
+        }
+
+        function deleteItem(index) {
+            if(confirm('确定要狠心删掉这道菜吗？🥺')) {
+                menuData[currentTab].splice(index, 1);
+                saveData();
+                renderManagerItems();
+            }
+        }
+
+        function copyMarkdown() {
+            const copyText = document.getElementById("markdown-output");
+            if (!copyText.value) {
+                alert("先生成菜单再复制呀！🤪");
+                return;
+            }
+            copyText.select();
+            copyText.setSelectionRange(0, 99999); 
+            navigator.clipboard.writeText(copyText.value).then(() => {
+                const btn = document.querySelector('button[onclick="copyMarkdown()"]');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = "✅ 复制好啦！";
+                btn.classList.add("bg-green-600");
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.classList.remove("bg-green-600");
+                }, 2000);
+            });
+        }
+
+        // --- Initialization ---
+        window.onload = function() {
+            initData();
+            generateWeek();
+        };
+
+    </script>
+</body>
+</html>
