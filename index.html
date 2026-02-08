@@ -194,9 +194,13 @@
                                 <label class="block font-bold text-xs mb-1">菜名</label>
                                 <input type="text" id="new-name" class="w-full border-2 border-luly-dark rounded-lg p-2 focus:ring-2 focus:ring-luly-yellow outline-none" placeholder="比如：红烧狮子头">
                             </div>
-                            <div class="flex-[2]">
-                                <label class="block font-bold text-xs mb-1">食材备注 (选填)</label>
-                                <input type="text" id="new-ingredients" class="w-full border-2 border-luly-dark rounded-lg p-2 focus:ring-2 focus:ring-luly-yellow outline-none" placeholder="猪肉、马蹄...">
+                            <div class="flex-1">
+                                <label class="block font-bold text-xs mb-1">🥩 肉类食材</label>
+                                <input type="text" id="new-meat" class="w-full border-2 border-luly-dark rounded-lg p-2 focus:ring-2 focus:ring-luly-yellow outline-none" placeholder="猪肉、鸡蛋...">
+                            </div>
+                            <div class="flex-1">
+                                <label class="block font-bold text-xs mb-1">🥬 蔬菜食材</label>
+                                <input type="text" id="new-veg" class="w-full border-2 border-luly-dark rounded-lg p-2 focus:ring-2 focus:ring-luly-yellow outline-none" placeholder="白菜、葱...">
                             </div>
                             <button onclick="addItem()" class="bg-luly-green bg-[#4ecdc4] text-white border-2 border-luly-dark rounded-lg px-6 py-2 font-display hover:translate-y-[-2px] hover:shadow-lg transition-all">
                                 添加
@@ -229,91 +233,91 @@
         // --- Initial Data (Fallback) ---
         const defaultMenuData = {
             cold: [
-                {name: "葱油手撕鸡", ingredients: "鸡腿/整鸡、葱、姜"},
-                {name: "香菜拌牛肉", ingredients: "牛肉、香菜"},
-                {name: "凉拌黄瓜", ingredients: "黄瓜、大蒜、小米辣"},
-                {name: "糖渍番茄", ingredients: "番茄、糖"},
-                {name: "酸辣柠檬虾", ingredients: "虾、柠檬、辣椒"},
-                {name: "泰式柠檬虾", ingredients: "虾、泰式调料"},
+                {name: "葱油手撕鸡", ingredients: "鸡腿/整鸡 | 葱、姜"},
+                {name: "香菜拌牛肉", ingredients: "牛肉 | 香菜"},
+                {name: "凉拌黄瓜", ingredients: " | 黄瓜、大蒜、小米辣"},
+                {name: "糖渍番茄", ingredients: " | 番茄、糖"},
+                {name: "酸辣柠檬虾", ingredients: "虾 | 柠檬、辣椒"},
+                {name: "泰式柠檬虾", ingredients: "虾 | 泰式调料"},
             ],
             pressure: [
-                {name: "非常童年卤鸡腿", ingredients: "鸡腿，鸡蛋，葱，姜，蒜"},
-                {name: "番茄牛腩", ingredients: "牛腩、番茄、洋葱、土豆、姜、番茄酱"},
-                {name: "土豆牛腩", ingredients: "牛腩、土豆、胡萝卜、姜"},
-                {name: "煲仔饭", ingredients: "广式腊肠、菜心、鸡蛋、姜、蚝油"},
-                {name: "韩式拌饭", ingredients: "豆芽、菠菜、胡萝卜、香菇、牛肉丝/五花肉、鸡蛋"},
+                {name: "非常童年卤鸡腿", ingredients: "鸡腿、鸡蛋 | 葱、姜、蒜"},
+                {name: "番茄牛腩", ingredients: "牛腩 | 番茄、洋葱、土豆、姜、番茄酱"},
+                {name: "土豆牛腩", ingredients: "牛腩 | 土豆、胡萝卜、姜"},
+                {name: "煲仔饭", ingredients: "广式腊肠、鸡蛋 | 菜心、姜、蚝油"},
+                {name: "韩式拌饭", ingredients: "牛肉丝/五花肉、鸡蛋 | 豆芽、菠菜、胡萝卜、香菇"},
             ],
             hard: [
-                {name: "火锅", ingredients: "火锅底料、牛羊肉卷、各种丸子、豆腐、蔬菜"},
-                {name: "寿喜锅", ingredients: "牛肉片、内脂豆腐、香菇、金针菇、大白菜、无菌蛋"},
-                {name: "椰子鸡", ingredients: "整鸡、椰子水、姜、沙姜、青柠"},
-                {name: "日式咖喱", ingredients: "鸡肉/牛肉、土豆、胡萝卜、洋葱、咖喱块、椰浆"},
+                {name: "火锅", ingredients: "牛羊肉卷、各种丸子 | 豆腐、蔬菜、火锅底料"},
+                {name: "寿喜锅", ingredients: "牛肉片、无菌蛋 | 内脂豆腐、香菇、金针菇、大白菜"},
+                {name: "椰子鸡", ingredients: "整鸡 | 椰子水、姜、沙姜、青柠"},
+                {name: "日式咖喱", ingredients: "鸡肉/牛肉 | 土豆、胡萝卜、洋葱、咖喱块、椰浆"},
             ],
             meat: [
-                {name: "黑椒海盐杰克牛排", ingredients: "牛排、黑胡椒、海盐、大蒜、迷迭香、黄油"},
-                {name: "蒜香黑椒牛柳", ingredients: "牛里脊、大蒜、黑胡椒、蚝油、淀粉"},
-                {name: "菜椒西兰花西葫芦炒牛柳", ingredients: "牛里脊、彩椒、西兰花、西葫芦、大蒜"},
-                {name: "超级luly黄焖鸡", ingredients: "鸡腿肉、干香菇、土豆、青椒、姜、黄豆酱"},
-                {name: "干煎柠檬鸡", ingredients: "鸡腿肉、柠檬、蜂蜜、黑胡椒、大蒜"},
-                {name: "小鸡炖土豆加蘑菇", ingredients: "鸡肉、蘑菇、土豆、粉条、姜"},
-                {name: "葱油焖鸡", ingredients: "鸡腿肉、红葱头/大葱"},
-                {name: "彩椒炒鸡腿肉", ingredients: "鸡腿肉、彩椒"},
-                {name: "可乐鸡翅", ingredients: "鸡翅、可乐"},
-                {name: "糖醋排骨", ingredients: "猪排骨、姜、芝麻、香醋"},
-                {name: "无敌甜椒辣炒肉", ingredients: "猪肉、甜椒、尖椒、大蒜"},
-                {name: "农家一碗香", ingredients: "五花肉、鸡蛋、青椒、大蒜、豆豉"},
-                {name: "回锅肉", ingredients: "五花肉、青蒜、豆瓣酱"},
-                {name: "年糕汤（鱼丸）", ingredients: "年糕、鱼丸、虾皮、紫菜、葱、白胡椒粉"},
-                {name: "蒜蓉黄油虾", ingredients: "虾、蒜蓉、黄油"},
-                {name: "香煎龙利鱼", ingredients: "龙利鱼、黑胡椒"},
+                {name: "黑椒海盐杰克牛排", ingredients: "牛排、黄油 | 黑胡椒、海盐、大蒜、迷迭香"},
+                {name: "蒜香黑椒牛柳", ingredients: "牛里脊 | 大蒜、黑胡椒、蚝油、淀粉"},
+                {name: "菜椒西兰花西葫芦炒牛柳", ingredients: "牛里脊 | 彩椒、西兰花、西葫芦、大蒜"},
+                {name: "超级luly黄焖鸡", ingredients: "鸡腿肉 | 干香菇、土豆、青椒、姜、黄豆酱"},
+                {name: "干煎柠檬鸡", ingredients: "鸡腿肉 | 柠檬、蜂蜜、黑胡椒、大蒜"},
+                {name: "小鸡炖土豆加蘑菇", ingredients: "鸡肉 | 蘑菇、土豆、粉条、姜"},
+                {name: "葱油焖鸡", ingredients: "鸡腿肉 | 红葱头/大葱"},
+                {name: "彩椒炒鸡腿肉", ingredients: "鸡腿肉 | 彩椒"},
+                {name: "可乐鸡翅", ingredients: "鸡翅 | 可乐"},
+                {name: "糖醋排骨", ingredients: "猪排骨 | 姜、芝麻、香醋"},
+                {name: "无敌甜椒辣炒肉", ingredients: "猪肉 | 甜椒、尖椒、大蒜"},
+                {name: "农家一碗香", ingredients: "五花肉、鸡蛋 | 青椒、大蒜、豆豉"},
+                {name: "回锅肉", ingredients: "五花肉 | 青蒜、豆瓣酱"},
+                {name: "年糕汤（鱼丸）", ingredients: "鱼丸 | 年糕、虾皮、紫菜、葱、白胡椒粉"},
+                {name: "蒜蓉黄油虾", ingredients: "虾、黄油 | 蒜蓉"},
+                {name: "香煎龙利鱼", ingredients: "龙利鱼 | 黑胡椒"},
             ],
             veg: [
-                {name: "蚝油生菜", ingredients: "生菜、大蒜、蚝油、淀粉"},
-                {name: "清炒白菜", ingredients: "大白菜、大蒜"},
-                {name: "清炒西兰花", ingredients: "西兰花、大蒜"},
-                {name: "蒜香芦笋", ingredients: "芦笋、大蒜"},
-                {name: "醋溜白菜", ingredients: "大白菜、干辣椒、大蒜"},
-                {name: "手撕包菜", ingredients: "卷心菜、五花肉片、干辣椒、大蒜、蒸鱼豉油"},
-                {name: "蒜香煎豆腐", ingredients: "豆腐、蒜"},
-                {name: "luly最爱番茄炒蛋", ingredients: "番茄、鸡蛋、小葱、番茄酱"},
-                {name: "黄瓜炒蛋", ingredients: "黄瓜、鸡蛋、大蒜"},
-                {name: "西葫芦炒蛋", ingredients: "西葫芦、鸡蛋、大蒜"},
-                {name: "红烧土豆片", ingredients: "土豆、酱油"},
-                {name: "地三鲜", ingredients: "茄子、土豆、青椒、大蒜、淀粉"},
-                {name: "土豆烩茄子", ingredients: "土豆、茄子、大蒜、黄豆酱"},
-                {name: "肉末茄子", ingredients: "茄子、猪肉末、姜、蒜、豆瓣酱"},
-                {name: "豆角烧肉", ingredients: "豆角、五花肉"},
-                {name: "番茄鸡蛋汤", ingredients: "番茄、鸡蛋、葱、香油"},
-                {name: "番茄白菜汤", ingredients: "番茄、大白菜、姜"},
-                {name: "豆腐蘑菇汤", ingredients: "嫩豆腐、杂菇、葱、白胡椒粉"},
-                {name: "玉米排骨汤", ingredients: "玉米、排骨"},
+                {name: "蚝油生菜", ingredients: " | 生菜、大蒜、蚝油、淀粉"},
+                {name: "清炒白菜", ingredients: " | 大白菜、大蒜"},
+                {name: "清炒西兰花", ingredients: " | 西兰花、大蒜"},
+                {name: "蒜香芦笋", ingredients: " | 芦笋、大蒜"},
+                {name: "醋溜白菜", ingredients: " | 大白菜、干辣椒、大蒜"},
+                {name: "手撕包菜", ingredients: "五花肉片 | 卷心菜、干辣椒、大蒜、蒸鱼豉油"},
+                {name: "蒜香煎豆腐", ingredients: " | 豆腐、蒜"},
+                {name: "luly最爱番茄炒蛋", ingredients: "鸡蛋 | 番茄、小葱、番茄酱"},
+                {name: "黄瓜炒蛋", ingredients: "鸡蛋 | 黄瓜、大蒜"},
+                {name: "西葫芦炒蛋", ingredients: "鸡蛋 | 西葫芦、大蒜"},
+                {name: "红烧土豆片", ingredients: " | 土豆、酱油"},
+                {name: "地三鲜", ingredients: " | 茄子、土豆、青椒、大蒜、淀粉"},
+                {name: "土豆烩茄子", ingredients: " | 土豆、茄子、大蒜、黄豆酱"},
+                {name: "肉末茄子", ingredients: "猪肉末 | 茄子、姜、蒜、豆瓣酱"},
+                {name: "豆角烧肉", ingredients: "五花肉 | 豆角"},
+                {name: "番茄鸡蛋汤", ingredients: "鸡蛋 | 番茄、葱、香油"},
+                {name: "番茄白菜汤", ingredients: " | 番茄、大白菜、姜"},
+                {name: "豆腐蘑菇汤", ingredients: " | 嫩豆腐、杂菇、葱、白胡椒粉"},
+                {name: "玉米排骨汤", ingredients: "排骨 | 玉米"},
             ],
             steamed: [
-                {name: "蒸鸡蛋", ingredients: "鸡蛋、香油、葱花"},
-                {name: "南瓜蒸牛肉", ingredients: "牛肉片、南瓜、姜丝、蒜末"},
-                {name: "香菇滑鸡", ingredients: "鸡腿肉、干香菇、红枣、姜、淀粉"},
+                {name: "蒸鸡蛋", ingredients: "鸡蛋 | 香油、葱花"},
+                {name: "南瓜蒸牛肉", ingredients: "牛肉片 | 南瓜、姜丝、蒜末"},
+                {name: "香菇滑鸡", ingredients: "鸡腿肉 | 干香菇、红枣、姜、淀粉"},
             ],
             riceNoodle: [
-                {name: "凉拌鸡丝", ingredients: "鸡胸肉、调料"},
-                {name: "海南鸡饭", ingredients: "鸡肉、大米、斑斓叶、香茅、姜、辣椒酱"},
-                {name: "卤肉饭", ingredients: "五花肉、红葱头酥、干香菇、鸡蛋、五香粉"},
-                {name: "打抛饭", ingredients: "猪肉末、罗勒叶、小米辣、大蒜、鱼露、鸡蛋"},
-                {name: "日式碎鸡饭", ingredients: "鸡肉末、鸡蛋、四季豆/荷兰豆、味醂"},
-                {name: "日式三文鱼盖饭", ingredients: "三文鱼、米饭"},
-                {name: "葱油鸡腿饭", ingredients: "鸡腿、葱油酱汁、青菜"},
-                {name: "照烧鸡腿饭", ingredients: "鸡腿、照烧汁"},
-                {name: "番茄滑蛋牛肉饭", ingredients: "牛肉片、番茄、鸡蛋"},
-                {name: "番茄肉酱意面", ingredients: "意面、猪/牛肉末、番茄、洋葱、大蒜"},
-                {name: "奶油鸡肉意面", ingredients: "意面、鸡腿肉、淡奶油、口蘑、菠菜"},
-                {name: "千层面", ingredients: "面皮、肉酱、芝士"},
-                {name: "酸汤水饺", ingredients: "水饺、陈醋、辣椒油、紫菜、虾皮、香菜"},
-                {name: "麻辣烫", ingredients: "各类丸子蔬菜"},
-                {name: "阳春面", ingredients: "面条、猪油、葱"},
+                {name: "凉拌鸡丝", ingredients: "鸡胸肉 | 调料"},
+                {name: "海南鸡饭", ingredients: "鸡肉 | 大米、斑斓叶、香茅、姜、辣椒酱"},
+                {name: "卤肉饭", ingredients: "五花肉、鸡蛋 | 红葱头酥、干香菇、五香粉"},
+                {name: "打抛饭", ingredients: "猪肉末、鸡蛋 | 罗勒叶、小米辣、大蒜、鱼露"},
+                {name: "日式碎鸡饭", ingredients: "鸡肉末、鸡蛋 | 四季豆/荷兰豆、味醂"},
+                {name: "日式三文鱼盖饭", ingredients: "三文鱼 | 米饭"},
+                {name: "葱油鸡腿饭", ingredients: "鸡腿 | 葱油酱汁、青菜"},
+                {name: "照烧鸡腿饭", ingredients: "鸡腿 | 照烧汁"},
+                {name: "番茄滑蛋牛肉饭", ingredients: "牛肉片、鸡蛋 | 番茄"},
+                {name: "番茄肉酱意面", ingredients: "猪/牛肉末 | 意面、番茄、洋葱、大蒜"},
+                {name: "奶油鸡肉意面", ingredients: "鸡腿肉 | 意面、淡奶油、口蘑、菠菜"},
+                {name: "千层面", ingredients: "肉酱、芝士 | 面皮"},
+                {name: "酸汤水饺", ingredients: "水饺 | 陈醋、辣椒油、紫菜、虾皮、香菜"},
+                {name: "麻辣烫", ingredients: "各类丸子 | 蔬菜"},
+                {name: "阳春面", ingredients: "猪油 | 面条、葱"},
             ],
             oven: [
-                {name: "烤茄子", ingredients: "茄子、蒜、剁椒、葱花、孜然粉"},
-                {name: "烤全鸡", ingredients: "整鸡、黄油、黑胡椒、柠檬、迷迭香"},
-                {name: "北京烤鸭", ingredients: "鸭子、蜂蜜、荷叶饼、葱丝、黄瓜条、甜面酱"},
+                {name: "烤茄子", ingredients: " | 茄子、蒜、剁椒、葱花、孜然粉"},
+                {name: "烤全鸡", ingredients: "整鸡、黄油 | 黑胡椒、柠檬、迷迭香"},
+                {name: "北京烤鸭", ingredients: "鸭子 | 蜂蜜、荷叶饼、葱丝、黄瓜条、甜面酱"},
             ]
         };
 
@@ -345,9 +349,41 @@
         // --- Generator Logic (Enhanced) ---
         const weekDays = ["周六", "周日", "周一", "周二", "周三", "周四", "周五"];
         
-        function getRandom(arr) {
+        // Track used dishes across the week to prevent duplicates
+        let usedDishes = new Set();
+        
+        function getRandom(arr, excludeSet = null) {
             if (!arr || arr.length === 0) return { name: "暂无菜品", ingredients: "" };
-            return arr[Math.floor(Math.random() * arr.length)];
+            
+            // Create a copy of the array
+            const availableItems = arr.filter(item => !excludeSet || !excludeSet.has(item.name));
+            
+            if (availableItems.length === 0) {
+                // If all items are used, reset and start over
+                return arr[Math.floor(Math.random() * arr.length)];
+            }
+            
+            return availableItems[Math.floor(Math.random() * availableItems.length)];
+        }
+        
+        // Fisher-Yates shuffle for better randomization
+        function shuffleArray(arr) {
+            const shuffled = [...arr];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+        
+        // Parse ingredients string into meat and veg parts
+        function parseIngredients(ingredientsStr) {
+            if (!ingredientsStr) return { meat: '', veg: '' };
+            const parts = ingredientsStr.split('|');
+            return {
+                meat: (parts[0] || '').trim() || '无',
+                veg: (parts[1] || '').trim() || '无'
+            };
         }
 
         function getDailyMenu(dayIndex) {
@@ -359,7 +395,11 @@
             // Safety check for empty categories
             const safeGet = (pool) => {
                 if (!pool || pool.length === 0) return null;
-                return getRandom(pool);
+                const dish = getRandom(pool, usedDishes);
+                if (dish && dish.name !== "暂无菜品") {
+                    usedDishes.add(dish.name);
+                }
+                return dish;
             }
 
             if (isWeekend) {
@@ -407,8 +447,11 @@
             const container = document.getElementById('visual-menu');
             const mdOutput = document.getElementById('markdown-output');
             
+            // Reset used dishes to prevent duplicates across the whole week
+            usedDishes = new Set();
+            
             container.innerHTML = '';
-            let markdownContent = "| 本周菜单 | 在家人数 | 菜单 |\n| :--- | :---: | :--- |\n";
+            let markdownContent = "| 本周菜单 | 在家人数 | 菜单 | 肉类 | 蔬菜 |\n| :--- | :---: | :--- | :--- | :--- |\n";
 
             weekDays.forEach((day, index) => {
                 const { dishes, comboType } = getDailyMenu(index);
@@ -432,13 +475,17 @@
                     typeClass = "bg-white " + randRot;
                 }
 
-                const dishesHtml = dishes.map(d => `
+                const dishesHtml = dishes.map(d => {
+                    const ing = parseIngredients(d.ingredients);
+                    return `
                     <div class="mb-3 last:mb-0 group/dish relative">
                         <div class="absolute -left-2 top-2 w-full h-2 bg-luly-yellow opacity-30 transform -skew-x-12 hidden group-hover/dish:block transition-all"></div>
                         <span class="relative font-bold text-lg text-luly-dark z-10 cursor-help">${d.name}</span>
-                        <p class="text-xs text-gray-500 mt-1 font-hand">${d.ingredients || '无特别食材'}</p>
+                        <p class="text-xs text-gray-600 mt-1 font-hand">🥩 ${ing.meat}</p>
+                        <p class="text-xs text-green-600 mt-0.5 font-hand">🥬 ${ing.veg}</p>
                     </div>
-                `).join('');
+                    `;
+                }).join('');
 
                 const people = (index === 0 || index === 1) ? "⭐☀" : (Math.random() > 0.3 ? "⭐☀" : "⭐");
 
@@ -458,7 +505,9 @@
                 container.appendChild(card);
 
                 const dishesText = dishes.map(d => d.name).join(" + ");
-                markdownContent += `| ${day} | ${people} | ${dishesText} |\n`;
+                const meatText = dishes.map(d => parseIngredients(d.ingredients).meat).join(" / ");
+                const vegText = dishes.map(d => parseIngredients(d.ingredients).veg).join(" / ");
+                markdownContent += `| ${day} | ${people} | ${dishesText} | ${meatText} | ${vegText} |\n`;
             });
 
             mdOutput.value = markdownContent;
@@ -520,12 +569,14 @@
             }
 
             items.forEach((item, index) => {
+                const ing = parseIngredients(item.ingredients);
                 const row = document.createElement('div');
                 row.className = "flex justify-between items-center bg-white p-3 mb-2 rounded-lg border border-gray-200 hover:border-luly-blue hover:shadow-md transition-all group";
                 row.innerHTML = `
                     <div>
-                        <span class="font-bold text-lg">${item.name}</span>
-                        <span class="text-xs text-gray-400 ml-2">${item.ingredients}</span>
+                        <div class="font-bold text-lg">${item.name}</div>
+                        <div class="text-xs text-gray-600 mt-1">🥩 ${ing.meat}</div>
+                        <div class="text-xs text-green-600">🥬 ${ing.veg}</div>
                     </div>
                     <button onclick="deleteItem(${index})" class="text-gray-300 hover:text-red-500 font-bold px-3 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
                         🗑️ 删除
@@ -537,10 +588,13 @@
 
         function addItem() {
             const nameInput = document.getElementById('new-name');
-            const ingInput = document.getElementById('new-ingredients');
+            const meatInput = document.getElementById('new-meat');
+            const vegInput = document.getElementById('new-veg');
             
             const name = nameInput.value.trim();
-            const ingredients = ingInput.value.trim();
+            const meat = meatInput.value.trim();
+            const veg = vegInput.value.trim();
+            const ingredients = `${meat} | ${veg}`;
 
             if (!name) {
                 alert("菜名不能为空哦！😤");
@@ -554,7 +608,8 @@
             
             // Clear inputs
             nameInput.value = '';
-            ingInput.value = '';
+            meatInput.value = '';
+            vegInput.value = '';
             
             // Refresh list
             renderManagerItems();
